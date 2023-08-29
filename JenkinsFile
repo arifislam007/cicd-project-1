@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                sh 'echo passed'
+                git branch: 'main', url: 'https://github.com/arifislam007/cicd-project-1.git'
+            }
+        }
+        stage('Build and Test') {
+            steps {
+                sh 'ls -ltr'
+                sh 'mvn clean package'
+                script {
+                    sh 'chmod -R 777 target'
+                }
+            }
+        }
+		stage('Update Deployment FIle') {
+            steps {
+                sh "sed -i 's/spring-bot:base/spring-bot:${BUILD_NUMBER}/' ./deployment.yml"
+            }
+        }
+		stage("Push to Git Repository") {
+			environment {
+				GITHUB_TOKEN = "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"
+				GIT_USER_NAME = "arifislam007"
+				GIT_REPO_NAME = "cicd-project-1.git"
+			}
+			steps {
+				
+				sh '''
+					git config --global user.email "islam.arif87@gmail.com"
+					git config --global user.name "arifislam007"
+					git fetch --all
+					git add .
+					git commit -m "deployment file updated version ${BUILD_NUMBER}"
+					git remote set-url origin https://${GIT_USER_NAME}:${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}
+					git push origin main
+				'''
+				
+			}
+		}
+		
+    }
+}
