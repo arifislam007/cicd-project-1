@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: spring-boot-app
-        image: arifislam/java-app:base
+        image: arifislam/cde19-java-app:base
         ports:
         - containerPort: 8080
 ---
