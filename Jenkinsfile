@@ -36,15 +36,15 @@ pipeline {
             steps {
                 script{
                     withDockerRegistry(credentialsId: 'Docker-cred') {
-                        sh "docker build -t arifislam/cde19-java-app:${BUILD_NUMBER} ."
-                        sh "docker push arifislam/cde19-java-app:${BUILD_NUMBER}"
+                        sh "docker build -t arifislam/blue-gree-app:${BUILD_NUMBER} ."
+                        sh "docker push arifislam/blue-gree-app:${BUILD_NUMBER}"
                     }
                 }
             }
         }
         stage('Update Deployment File Image Tag') {
             steps {
-                sh "sed -i 's/cde19-java-app:base/cde19-java-app:${BUILD_NUMBER}/' ./deployment.yml"
+                sh "sed -i 's/blue-gree-app:base/blue-gree-app:${BUILD_NUMBER}/' ./deployment.yml"
             }
         }
         stage('Deploy with Kubectl') {
