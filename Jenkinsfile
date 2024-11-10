@@ -45,6 +45,7 @@ pipeline {
         stage('Update Deployment File Image Tag') {
             steps {
                 sh "sed -i 's/blue-gree-app:base/blue-gree-app:${BUILD_NUMBER}/' ./deployment.yml"
+                sh "cat ./deployment.yml"
             }
         }
         stage('Deploy with Kubectl') {
