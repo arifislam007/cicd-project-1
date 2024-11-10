@@ -1,6 +1,5 @@
 pipeline {
     agent any
-    
     tools {
         jdk 'jdk'
         maven 'mvn'
@@ -10,7 +9,7 @@ pipeline {
     }
 
     stages {
-        stage('Git checkout') {
+        stage('Git Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/arifislam007/cicd-project-1.git'
             }
@@ -20,25 +19,15 @@ pipeline {
                 sh 'mvn compile'
             }
         }
-        stage('Test Stage') {
-            steps {
-                sh 'mvn test'
-            }
-        }
         stage('SonarQuibe Analisys') {
             steps {
-                withSonarQubeEnv('sonar') {
+                withSonarQubeEnv('sonarserver') {
                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=javaapp -Dsonar.projectKey=javaapp \
                             -Dsonar.java.binaries=. '''
                 }
             }
         }
-        stage('Quality Grade') {
-            steps {
-                waitForQualityGate abortPipeline: false, credentialsId: 'sonar-cred'
-            }
-        }
-        stage('Build Package') {
+        stage('Code Build') {
             steps {
                 sh 'mvn package'
             }
@@ -46,21 +35,21 @@ pipeline {
         stage('Docker Build and push') {
             steps {
                 script{
-                    withDockerRegistry(credentialsId: 'docker-cred') {
-                        sh "docker build -t arifislam/my-cicd:${BUILD_NUMBER} ."
-                        sh "docker push arifislam/my-cicd:${BUILD_NUMBER}"
+                    withDockerRegistry(credentialsId: 'Docker-cred') {
+                        sh "docker build -t arifislam/cde19-java-app:${BUILD_NUMBER} ."
+                        sh "docker push arifislam/cde19-java-app:${BUILD_NUMBER}"
                     }
                 }
             }
         }
         stage('Update Deployment File Image Tag') {
             steps {
-                sh "sed -i 's/spring-bot:base/my-cicd:${BUILD_NUMBER}/' ./deployment.yml"
+                sh "sed -i 's/cde19-java-app:base/cde19-java-app:${BUILD_NUMBER}/' ./deployment.yml"
             }
         }
-        stage('Deploy to Kubernetes') {
+        stage('Deploy with Kubectl') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'kubernetes', contextName: '', credentialsId: 'kub-cred', namespace: 'java-app', restrictKubeConfigAccess: false, serverUrl: 'https://192.168.207.10:6443') {
+                withKubeConfig(caCertificate: '', clusterName: 'kubernetes', contextName: '', credentialsId: 'kube-secret', namespace: 'java-app', restrictKubeConfigAccess: false, serverUrl: 'https://192.168.207.197:6443') {
                     sh 'kubectl apply -f deployment.yml -n java-app'
                 }
             }
