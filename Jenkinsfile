@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/arifislam007/cicd-project-1.git'
+                git branch: 'blueGree', url: 'https://github.com/arifislam007/cicd-project-1.git'
             }
         }
         stage('Code Compile') {
