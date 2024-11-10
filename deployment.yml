@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: my-java-app
-        image: arifislam/my-java-app:base  # Blue version image
+        image: arifislam/blue-gree-app:base  # Blue version image
         ports:
         - containerPort: 8080
 
@@ -45,7 +45,7 @@ spec:
     spec:
       containers:
       - name: my-java-app
-        image: arifislam/my-java-app:base  # Green version image
+        image: arifislam/blue-gree-app:base  # Green version image
         ports:
         - containerPort: 8080
 
